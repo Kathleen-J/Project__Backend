@@ -26,8 +26,8 @@ module.exports = {
   // staging: {
   //   client: 'postgresql',
   //   connection: {
-  //     database: 'route',
-  //     user:     'route',
+  //     database: 'main',
+  //     user:     'main',
   //     password: '123'
   //   },
   //   pool: {
@@ -42,8 +42,8 @@ module.exports = {
   // production: {
   //   client: 'postgresql',
   //   connection: {
-  //     database: 'route',
-  //     user:     'route',
+  //     database: 'main',
+  //     user:     'main',
   //     password: '123'
   //   },
   //   pool: {
