@@ -1,9 +1,8 @@
 const {Router} = require('express');
-const { getCuratorsOfDisciplines, getCuratorsOfDisciplinesJoin } = require('../db/crud/index');
+const { getActiveCuratorsOfDisciplines } = require('../crud/index');
 
 const router = Router();
 
-router.get('/', getCuratorsOfDisciplines);
-// router.get('/', getCuratorsOfDisciplinesJoin);
+router.get('/', getActiveCuratorsOfDisciplines);
 
 module.exports = router;

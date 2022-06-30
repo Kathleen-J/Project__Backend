@@ -20,7 +20,7 @@ module.exports = {
     },
 
     //2.0 education_areas (учебные направления) 
-    getEducationAreas: async (req, res)   => {
+    getActiveEducationAreas: async (req, res)   => {
     const db = knex(config.development.database);
     
     const ed_ar = await db
@@ -35,24 +35,8 @@ module.exports = {
     
     },
 
-    //3.0 disciplines (дисциплины)
-    getDisciplines: async (req, res)   => {
-        const db = knex(config.development.database);
-      
-        const disciplines = await db
-          .select({
-            id: 'd.id',
-            education_area: 'd.id_education_area',
-            discipline_name: 'd.discipline_name',
-            status: 'd.status_discipline'
-        })
-          .from({d: 'disciplines'});
-        res.status(200).json(disciplines);
-        
-    },
-
     //3.1 disciplines (дисциплины) JOIN 
-    getDisciplinesJoin: async (req, res)   => {
+    getActiveDisciplines: async (req, res)   => {
         const db = knex(config.development.database);
     
         const disciplines = await db
@@ -88,7 +72,7 @@ module.exports = {
     },
 
     //4.1 education_programs (программы обучения) JOIN
-    getEducationProgramsJoin: async (req, res) => {
+    getActiveEducationPrograms: async (req, res) => {
         const db = knex(config.development.database);
     
         const education_programs = await db
@@ -108,6 +92,32 @@ module.exports = {
         .where({'ed_area.status_area': 'active'})
         .andWhere({'d.status_discipline': 'active'})
         .andWhere({'ed_pr.status_program': 'active'});
+        res.status(200).json(education_programs);
+    },
+
+    //4.2 education_program:id (программа обучения) JOIN
+    getActiveEducationProgram: async (req, res) => {
+        const {id} = req.params;
+        const db = knex(config.development.database);
+    
+        const education_programs = await db
+        .first({
+            id: 'ed_pr.id',
+            education_form: 'ed_form.form_name',
+            education_area: 'ed_area.area_name',
+            discipline: 'd.discipline_name',
+            education_program: 'ed_pr.profile_name',
+            profile_name: 'ed_pr.profile_name',
+            price: 'ed_pr.price'
+        })
+        .from({ed_pr: 'education_programs'})
+        .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
+        .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
+        .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+        .where({'ed_area.status_area': 'active'})
+        .andWhere({'d.status_discipline': 'active'})
+        .andWhere({'ed_pr.status_program': 'active'})
+        .andWhere({'ed_pr.id': id});
         res.status(200).json(education_programs);
     },
 
@@ -143,7 +153,7 @@ module.exports = {
     },
 
     //6.1 users (пользователи) JOIN 
-    getUsersJoin: async (req, res) => {
+    getActiveUsers: async (req, res) => {
         const db = knex(config.development.database);
     
         const users = await db
@@ -160,20 +170,8 @@ module.exports = {
         res.status(200).json(users);
     },
 
-    //7.0 students_education_programs (образовательные программы учеников)
-    getStudentsEducationPrograms: async (req, res) => {
-        const db = knex(config.development.database);
-    
-        const st_ed_pr = await db
-        .select({
-            request: 'st_ed_pr.*'
-        })
-        .from({st_ed_pr: 'students_education_programs'});
-        res.status(200).json(st_ed_pr);
-    },
-
     //7.1 students_education_programs (образовательные программы учеников)
-    getStudentsEducationProgramsJoin: async (req, res) => {
+    getStudentsEducationPrograms: async (req, res) => {
         const db = knex(config.development.database);
     
         const st_ed_pr = await db
@@ -198,20 +196,8 @@ module.exports = {
         res.status(200).json(st_ed_pr);
     },
 
-    //8.0 curators_of_disciplines (кураторы дисциплин)
-    getCuratorsOfDisciplines: async (req, res) => {
-        const db = knex(config.development.database);
-    
-        const curators_dis = await db
-        .select({
-            request: 'curators_dis.*'
-        })
-        .from({curators_dis: 'curators_of_disciplines'});
-        res.status(200).json(curators_dis);
-    },
-
     //8.1 curators_of_disciplines (кураторы дисциплин)
-    getCuratorsOfDisciplinesJoin: async (req, res) => {
+    getActiveCuratorsOfDisciplines: async (req, res) => {
         const db = knex(config.development.database);
     
         const curators_dis = await db
@@ -230,20 +216,8 @@ module.exports = {
         res.status(200).json(curators_dis);
     },
 
-    //9.0 curators_distribution (распределение кураторов)
-    getCuratorsDistribution: async (req, res) => {
-        const db = knex(config.development.database);
-    
-        const curators = await db
-        .select({
-            request: 'curators.*'
-        })
-        .from({curators: 'curators_distribution'});
-        res.status(200).json(curators);
-    },
-
     //9.1 curators_distribution (распределение кураторов) JOIN 
-    getCuratorsDistributionJoin: async (req, res) => {
+    getCuratorsDistribution: async (req, res) => {
         const db = knex(config.development.database);
     
         const curators = await db
@@ -273,7 +247,7 @@ module.exports = {
 
 
 
-    //                                                 [ON PROGRESS]
+    //                                                   [ON PROGRESS]
     //                                               POST / PUT / DELETE
 
     //1.0 education_areas (учебные направления)

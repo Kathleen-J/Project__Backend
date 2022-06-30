@@ -1,8 +1,8 @@
 const {Router} = require('express');
-const { getEducationAreas } = require('../db/crud/index');
+const { getActiveEducationAreas } = require('../crud/index');
 
 const router = Router();
 
-router.get('/', getEducationAreas);
+router.get('/', getActiveEducationAreas);
 
 module.exports = router;

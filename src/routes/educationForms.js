@@ -1,5 +1,5 @@
 const {Router} = require('express');
-const { getEducationForms } = require('../db/crud/index');
+const { getEducationForms } = require('../crud/index');
 
 const router = Router();
 

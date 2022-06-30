@@ -1,9 +1,8 @@
 const {Router} = require('express');
-const { getDisciplines, getDisciplinesJoin } = require('../db/crud/index');
+const { getActiveDisciplines } = require('../crud/index');
 
 const router = Router();
 
-router.get('/', getDisciplines);
-// router.get('/', getDisciplinesJoin);
+router.get('/', getActiveDisciplines);
 
 module.exports = router;
