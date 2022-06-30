@@ -1,10 +1,12 @@
 const {Router} = require('express');
-const { getActiveEducationPrograms, getActiveEducationProgram } = require('../crud/index');
+const { getActiveEducationProgram, getEducationPrograms, deleteProgram, updateProgram } = require('../crud/index');
 
 const router = Router();
 
-router.get('/', getActiveEducationPrograms);
-router.get('/:id', getActiveEducationProgram)
+router.get('/', getEducationPrograms);
+router.get('/:id', getActiveEducationProgram);
+router.delete('/:id', deleteProgram);
+router.put('/:id', updateProgram);
 
 
 

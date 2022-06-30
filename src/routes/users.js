@@ -1,8 +1,8 @@
 const {Router} = require('express');
-const { getActiveUsers } = require('../crud/index');
+const { getUsers } = require('../crud/index');
 
 const router = Router();
 
-router.get('/', getActiveUsers);
+router.get('/', getUsers);
 
 module.exports = router;
