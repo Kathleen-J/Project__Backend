@@ -162,6 +162,38 @@ module.exports = {
         res.status(200).json(users);
     },
 
+    getStudents: async (req, res) => {
+        const db = knex(config.development.database);
+
+        const students = await db
+        .select({
+            id: 'u.id',
+            login: 'u.login',
+            status: 'u.status_user',
+            role: 'r.role'
+        })
+        .from({u: 'users'})
+        .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
+        .where({'r.role': 'student'});
+        res.status(200).json(users);
+    },
+
+    getCurators: async (req, res) => {
+        const db = knex(config.development.database);
+
+        const students = await db
+        .select({
+            id: 'u.id',
+            login: 'u.login',
+            status: 'u.status_user',
+            role: 'r.role'
+        })
+        .from({u: 'users'})
+        .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
+        .where({'r.role': 'curator'});
+        res.status(200).json(users);
+    },
+
 
 
     //                                           STUDENT'S EDUCATION PROGRAMS

@@ -13,7 +13,6 @@
   await knex.raw('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
   await knex.raw('TRUNCATE TABLE students_education_programs RESTART IDENTITY CASCADE');
   await knex.raw('TRUNCATE TABLE curators_of_disciplines RESTART IDENTITY CASCADE');
-  await knex.raw('TRUNCATE TABLE curators_distribution RESTART IDENTITY CASCADE');
   
   //insert
   await knex('education_forms').insert([
@@ -48,9 +47,9 @@
     {id_education_form: 2, id_discipline: 7, profile_name: 'Разговорный французский', price: 25000},
   ]);
   await knex('roles').insert([
-    {role: 'Студент'},
-    {role: 'Куратор'},
-    {role: 'Администартор'},
+    {role: 'student'},
+    {role: 'curator'},
+    {role: 'admin'},
   ]);
   await knex('users').insert([
     {login: 'Kathleen', password: '123', id_role: 3},
@@ -60,6 +59,9 @@
     {login: 'Kevin', password: '123', id_role: 1},
     {login: 'Richard', password: '123', id_role: 1},
     {login: 'Jane', password: '123', id_role: 1},
+    {login: 'Mary', password: '123', id_role: 1},
+    {login: 'Oswald', password: '123', id_role: 1},
+    {login: 'Pete', password: '123', id_role: 1},
   ]);
   await knex.raw('INSERT INTO students_education_programs (id_user, id_education_program) VALUES (1, 1)');
   await knex('curators_of_disciplines').insert([
@@ -72,6 +74,5 @@
     {id_user_curator: 3, id_discipline: 6},
     {id_user_curator: 3, id_discipline: 7},
   ]);
-  await knex.raw('INSERT INTO curators_distribution (id_student_education_program, id_curator_of_discipline) VALUES (1, 1)');
 
 };

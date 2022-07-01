@@ -203,30 +203,6 @@
         .comment('Статус куратора');
       table.comment('Кураторы дисциплин');
     });
-    await knex.schema.createTable('curators_distribution', (table) => {
-      table
-        .increments('id')
-        .primary()
-        .comment('Идентификатор');
-      table
-        .integer('id_student_education_program')
-        .notNullable()
-        .references('id')
-        .inTable('students_education_programs')
-        .comment('Идентификатор программы обучения студента');
-      table
-        .integer('id_curator_of_discipline')
-        .notNullable()
-        .references('id')
-        .inTable('curators_of_disciplines')
-        .comment('Идентификатор куратора конкретной дисциплины');
-      table
-        .string('status_distribution', 64)
-        .notNullable()
-        .defaultTo('active')
-        .comment('Статус распределения');
-      table.comment('Распределение кураторов');
-    });
   };
   
   /**
@@ -242,5 +218,4 @@
     await knex.schema.dropTable('users');
     await knex.schema.dropTable('students_education_programs');
     await knex.schema.dropTable('curators_of_disciplines');
-    await knex.schema.dropTable('curators_distribution');
   };
