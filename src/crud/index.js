@@ -155,12 +155,18 @@ module.exports = {
             login: 'u.login',
             password: 'u.password',
             status: 'u.status_user',
-            role: 'r.role'
+            role: 'r.role',
+            created: 'u.created_at',
+            updated: 'u.updated_at'
         })
         .from({u: 'users'})
         .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'});
         res.status(200).json(users);
     },
+
+
+
+    //                                                     STUDENTS
 
     getStudents: async (req, res) => {
         const db = knex(config.development.database);
@@ -170,29 +176,102 @@ module.exports = {
             id: 'u.id',
             login: 'u.login',
             status: 'u.status_user',
-            role: 'r.role'
+            role: 'r.role',
+            created: 'u.created_at',
+            updated: 'u.updated_at'
         })
         .from({u: 'users'})
         .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
         .where({'r.role': 'student'});
-        res.status(200).json(users);
+        res.status(200).json(students);
     },
 
+    deleteStudent: async (req, res) => {
+        const {id} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            status_user: 'deleted',
+            updated_at: new Date().toISOString()         
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+    updateStudent: async (req, res) => {
+        const {id} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            status_user: 'active',
+            updated_at: new Date().toISOString()        
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+
+
+    //                                                     CURATORS
     getCurators: async (req, res) => {
         const db = knex(config.development.database);
 
-        const students = await db
+        const curators = await db
         .select({
             id: 'u.id',
             login: 'u.login',
             status: 'u.status_user',
-            role: 'r.role'
+            role: 'r.role',
+            created: 'u.created_at',
+            updated: 'u.updated_at'
         })
         .from({u: 'users'})
         .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
         .where({'r.role': 'curator'});
-        res.status(200).json(users);
+        res.status(200).json(curators);
     },
+
+    
+    deleteCurator: async (req, res) => {
+        const {id} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            status_user: 'deleted',
+            updated_at: new Date().toISOString()          
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+    updateCurator: async (req, res) => {
+        const {id} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            status_user: 'active',
+            updated_at: new Date().toISOString()         
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
 
 
 
@@ -246,39 +325,6 @@ module.exports = {
         .where({'u.status_user': 'active'})
         .andWhere({'curators_dis.status_curator': 'active'});
         res.status(200).json(curators_dis);
-    },
-
-
-
-    //                                              CURATOR'S DISTRIBUTION
-
-    //9.1 curators_distribution (распределение кураторов) JOIN 
-    getCuratorsDistribution: async (req, res) => {
-        const db = knex(config.development.database);
-    
-        const curators = await db
-        .select({
-            id: 'c_d.id',
-            student: 'us1.login',
-            education_form: 'ed_form.form_name',
-            education_area: 'ed_area.area_name',
-            discipline: 'd.discipline_name',
-            profile: 'ed_pr.profile_name',
-            status: 'st_ed_pr.education_status',
-            progress: 'st_ed_pr.progress',
-            test_result: 'st_ed_pr.test_results',
-            curator: 'us2.login'
-        })
-        .from({c_d: 'curators_distribution'})
-        .innerJoin({st_ed_pr: 'students_education_programs'}, {'c_d.id_student_education_program': 'st_ed_pr.id'})
-        .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
-        .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
-        .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
-        .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
-        .innerJoin({curators_dis: 'curators_of_disciplines'}, {'c_d.id_curator_of_discipline': 'curators_dis.id'})
-        .innerJoin({us1: 'users'}, {'st_ed_pr.id_user': 'us1.id'})
-        .innerJoin({us2: 'users'}, {'curators_dis.id_user_curator': 'us2.id'});
-        res.status(200).json(curators);
     },
 
 };
