@@ -31,7 +31,7 @@
     {id_education_area: 2, discipline_name: '2D'},
     {id_education_area: 2, discipline_name: '3D'},
     {id_education_area: 3, discipline_name: 'Английский язык'},
-    {id_education_area: 3, discipline_name: 'Французский язык', status_discipline: 'deleted'},
+    {id_education_area: 3, discipline_name: 'Французский язык'},
   ]);
   await knex('education_programs').insert([
     {id_education_form: 1, id_discipline: 1, profile_name: 'Full-stack разработчик', price: 200000},
@@ -44,7 +44,7 @@
     {id_education_form: 1, id_discipline: 5, profile_name: '3D художник', price: 115000},
     {id_education_form: 2, id_discipline: 6, profile_name: 'Разговорный английский', price: 20000},
     {id_education_form: 2, id_discipline: 6, profile_name: 'Технический английский', price: 30000, status_program: 'deleted'},
-    {id_education_form: 2, id_discipline: 7, profile_name: 'Разговорный французский', price: 25000},
+    {id_education_form: 2, id_discipline: 7, profile_name: 'Разговорный французский', price: 25000, status_program: 'deleted'},
   ]);
   await knex('roles').insert([
     {role: 'student'},
@@ -63,7 +63,16 @@
     {login: 'Oswald', password: '123', id_role: 1},
     {login: 'Pete', password: '123', id_role: 1},
   ]);
-  await knex.raw('INSERT INTO students_education_programs (id_user, id_education_program) VALUES (1, 1)');
+  await knex('students_education_programs').insert([
+    {id_user: '5', id_education_program: '1'},
+    {id_user: '5', id_education_program: '4'},
+    {id_user: '6', id_education_program: '6'},
+    {id_user: '7', id_education_program: '7'},
+    {id_user: '8', id_education_program: '2'},
+    {id_user: '9', id_education_program: '3'},
+    {id_user: '9', id_education_program: '5'},
+    {id_user: '10', id_education_program: '8'},
+  ]);
   await knex('curators_of_disciplines').insert([
     {id_user_curator: 2, id_discipline: 1},
     {id_user_curator: 2, id_discipline: 2},

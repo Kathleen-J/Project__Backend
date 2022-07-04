@@ -16,7 +16,8 @@ module.exports = {
         status: 'ed_ar.status_area'
     })
         .from({ed_ar: 'education_areas'})
-        .where({'ed_ar.status_area': 'active'});
+        .where({'ed_ar.status_area': 'active'})
+        .orderBy('ed_ar.id');
     res.status(200).json(ed_ar);
     
     },
@@ -44,7 +45,8 @@ module.exports = {
             .from({ed_pr: 'education_programs'})
             .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
             .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
-            .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'});
+            .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+            .orderBy('ed_pr.price', 'desc');
             res.status(200).json(education_programs);
         } else {
             const education_programs = await db
@@ -64,7 +66,8 @@ module.exports = {
             .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
             .where({'ed_area.status_area': 'active'})
             .andWhere({'d.status_discipline': 'active'})
-            .andWhere({'ed_pr.status_program': 'active'});
+            .andWhere({'ed_pr.status_program': 'active'})
+            .orderBy('ed_pr.price', 'desc');
             res.status(200).json(education_programs);
         }
     },
@@ -91,7 +94,8 @@ module.exports = {
         .where({'ed_area.status_area': 'active'})
         .andWhere({'d.status_discipline': 'active'})
         .andWhere({'ed_pr.status_program': 'active'})
-        .andWhere({'ed_pr.id': id});
+        .andWhere({'ed_pr.id': id})
+        .orderBy('ed_pr.id');
         res.status(200).json(education_programs);
     },
 
@@ -182,7 +186,8 @@ module.exports = {
         })
         .from({u: 'users'})
         .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
-        .where({'r.role': 'student'});
+        .where({'r.role': 'student'})
+        .orderBy('u.id');
         res.status(200).json(students);
     },
 
@@ -210,6 +215,22 @@ module.exports = {
         .from('users')
         .update({
             status_user: 'active',
+            updated_at: new Date().toISOString()         
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+    updateStudentLogin: async (req, res) => {
+        const {id, login} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            login,
             updated_at: new Date().toISOString()        
         })
         .where({id});
@@ -217,6 +238,24 @@ module.exports = {
 
         return;
     },
+
+    updateStudentPassword: async (req, res) => {
+        const {id, password} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            password,
+            updated_at: new Date().toISOString()        
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+
 
 
 
@@ -235,10 +274,10 @@ module.exports = {
         })
         .from({u: 'users'})
         .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
-        .where({'r.role': 'curator'});
+        .where({'r.role': 'curator'})
+        .orderBy('u.id');
         res.status(200).json(curators);
     },
-
     
     deleteCurator: async (req, res) => {
         const {id} = req.body;
@@ -272,6 +311,38 @@ module.exports = {
         return;
     },
 
+    updateCuratorLogin: async (req, res) => {
+        const {id, login} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            login,
+            updated_at: new Date().toISOString()        
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+    updateCuratorPassword: async (req, res) => {
+        const {id, password} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('users')
+        .update({
+            password,
+            updated_at: new Date().toISOString()        
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
 
 
 
@@ -284,12 +355,14 @@ module.exports = {
         const st_ed_pr = await db
         .select({
             id: 'st_ed_pr.id',
+            id_student: 'st_ed_pr.id_user',
             login: 'u.login',
             education_form: 'ed_form.form_name',
             education_area: 'ed_area.area_name',
             discipline: 'd.discipline_name',
             profile: 'ed_pr.profile_name',
-            status: 'st_ed_pr.education_status',
+            status_education: 'st_ed_pr.education_status',
+            status_program: 'st_ed_pr.program_status', 
             modules: 'ed_pr.modules',
             progress: 'st_ed_pr.progress',
             test_results: 'st_ed_pr.test_results'
@@ -299,8 +372,65 @@ module.exports = {
         .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
         .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
         .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
-        .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'});
+        .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+        .orderBy('st_ed_pr.id');
         res.status(200).json(st_ed_pr);
+    },
+
+    updateStudentsEducationPrograms: async (req, res) => {
+        const {id, value} = req.body;
+        const db = knex(config.development.database);
+        
+        if(value === 'deleted') {
+            
+            await db
+            .from('students_education_programs')
+            .update({
+                program_status: 'active',
+                status_updated_at: new Date().toISOString()         
+            })
+            .where({id});
+            res.status(200);
+            
+        } else if (value === 'finished') {
+            
+            await db
+            .from('students_education_programs')
+            .update({
+                education_status: 'unfinished'       
+            })
+            .where({id});
+            res.status(200);
+        }
+        
+    },
+      
+    deleteStudentsEducationPrograms: async (req, res) => {
+    const {id, value} = req.body;
+    const db = knex(config.development.database);
+    
+    if(value === 'active') {
+        
+        await db
+        .from('students_education_programs')
+        .update({
+            program_status: 'deleted',
+            status_updated_at: new Date().toISOString()         
+        })
+        .where({id});
+        res.status(200);
+        
+    } else if (value === 'unfinished') {
+        
+        await db
+        .from('students_education_programs')
+        .update({
+            education_status: 'finished'       
+        })
+        .where({id});
+        res.status(200);
+    }
+    
     },
 
 
@@ -314,17 +444,70 @@ module.exports = {
         const curators_dis = await db
         .select({
             id: 'curators_dis.id',
+            id_curator: 'curators_dis.id_user_curator',
             login: 'u.login',
             education_area: 'ed_area.area_name',
-            discipline: 'd.discipline_name'
+            discipline: 'd.discipline_name',
+            status: 'curators_dis.status_curator'
         })
         .from({curators_dis: 'curators_of_disciplines'})
         .innerJoin({u: 'users'}, {'curators_dis.id_user_curator': 'u.id'})
         .innerJoin({d: 'disciplines'}, {'curators_dis.id_discipline': 'd.id'})
         .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
         .where({'u.status_user': 'active'})
-        .andWhere({'curators_dis.status_curator': 'active'});
+        .andWhere({'curators_dis.status_curator': 'active'})
+        .orderBy('curators_dis.id');
         res.status(200).json(curators_dis);
+    },
+
+    getCuratorsOfDisciplines: async (req, res) => {
+        const db = knex(config.development.database);
+    
+        const curators_dis = await db
+        .select({
+            id: 'curators_dis.id',
+            id_curator: 'curators_dis.id_user_curator',
+            login: 'u.login',
+            education_area: 'ed_area.area_name',
+            discipline: 'd.discipline_name',
+            status: 'curators_dis.status_curator'
+        })
+        .from({curators_dis: 'curators_of_disciplines'})
+        .innerJoin({u: 'users'}, {'curators_dis.id_user_curator': 'u.id'})
+        .innerJoin({d: 'disciplines'}, {'curators_dis.id_discipline': 'd.id'})
+        .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+        .orderBy('curators_dis.id');
+        res.status(200).json(curators_dis);
+    },
+
+    deleteCuratorsDiscipline: async (req, res) => {
+        const {id} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('curators_of_disciplines')
+        .update({
+            status_curator: 'deleted'        
+        })
+        .where({id});
+        res.status(200);
+
+        return;
+    },
+
+    updateCuratorsDiscipline: async (req, res) => {
+        const {id} = req.body;
+        const db = knex(config.development.database);
+
+        await db
+        .from('curators_of_disciplines')
+        .update({
+            status_curator: 'active'      
+        })
+        .where({id});
+        res.status(200);
+
+        return;
     },
 
 };

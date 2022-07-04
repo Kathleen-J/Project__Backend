@@ -157,8 +157,13 @@
       table
         .string('education_status', 64)
         .notNullable()
-        .defaultTo('active')
+        .defaultTo('unfinished')
         .comment('Статус обучения');
+      table
+        .string('program_status', 64)
+        .notNullable()
+        .defaultTo('active')
+        .comment('Статус программы');
       table
         .specificType('progress', 'integer ARRAY')
         .comment('Прогресс обучения');
