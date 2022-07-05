@@ -1,5 +1,5 @@
 const {Router} = require('express');
-const { getStudentsEducationPrograms, deleteStudentsEducationPrograms, updateStudentsEducationPrograms } = require('../crud/index');
+const { getStudentsEducationPrograms, deleteStudentsEducationPrograms, updateStudentsEducationPrograms } = require('../controllers/index');
 
 const router = Router();
 

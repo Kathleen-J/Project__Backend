@@ -1,8 +1,12 @@
 const {Router} = require('express');
-const { getUsers } = require('../crud/index');
+const { deleteUser, updateUser, getCurators, getStudents } = require('../controllers/index');
 
 const router = Router();
 
-router.get('/', getUsers);
+router.get('/students', getStudents);
+router.get('/curators', getCurators);
+router.delete('/:id', deleteUser);
+router.put('/:id', updateUser);
+// router.post('/:id', createUser);
 
 module.exports = router;
