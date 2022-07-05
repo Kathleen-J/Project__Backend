@@ -15,11 +15,13 @@ module.exports = {
             education_area: 'ed_area.area_name',
             discipline: 'd.discipline_name',
             profile: 'ed_pr.profile_name',
+            purchase_date: 'st_ed_pr.purchase_date',
             status_education: 'st_ed_pr.education_status',
             status_program: 'st_ed_pr.program_status', 
             modules: 'ed_pr.modules',
-            progress: 'st_ed_pr.progress',
-            test_results: 'st_ed_pr.test_results'
+            test_results: 'st_ed_pr.test_results',
+            test_finished_at: 'st_ed_pr.test_finished_at',
+            status_updated_at: 'st_ed_pr.status_updated_at'
         })
         .from({st_ed_pr: 'students_education_programs'})
         .innerJoin({u: 'users'}, {'st_ed_pr.id_user': 'u.id'})
@@ -51,7 +53,8 @@ module.exports = {
             await db
             .from('students_education_programs')
             .update({
-                education_status: 'unfinished'       
+                education_status: 'unfinished',
+                status_updated_at: new Date().toISOString()      
             })
             .where({id});
             res.status(200);
@@ -79,7 +82,8 @@ module.exports = {
         await db
         .from('students_education_programs')
         .update({
-            education_status: 'finished'       
+            education_status: 'finished',
+            status_updated_at: new Date().toISOString()    
         })
         .where({id});
         res.status(200);

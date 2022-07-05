@@ -1,5 +1,6 @@
 const knex = require('knex');
 const config = require('../../configs/index');
+const bcrypt = require('bcrypt');
 
 module.exports = {
 
@@ -39,6 +40,37 @@ module.exports = {
         .where({'r.role': 'curator'})
         .orderBy('u.id');
         res.status(200).json(curators);
+    },
+
+    createUser: async (req, res) => {
+        const {role, login, password} = req.body;
+        const db = knex(config.development.database);
+
+        if (role === 'curator') {            
+            await db
+            .into('users')
+            .insert([{
+              login,
+              password: await bcrypt.hash(password, 8),
+              created_at: new Date().toISOString(),
+              id_role: 2
+            }]);
+            res.status(200).json({login, password});
+      
+            return;
+        } else if (role === 'student') {
+            await db
+            .into('users')
+            .insert([{
+              login,
+              password: await bcrypt.hash(password, 8),
+              created_at: new Date().toISOString(),
+              id_role: 1
+            }]);
+            res.status(200).json({login, password});
+      
+            return;
+        }
     },
 
     deleteUser: async (req, res) => {
@@ -87,7 +119,7 @@ module.exports = {
             await db
             .from('users')
             .update({
-                password,
+                password: await bcrypt.hash(password, 8),
                 updated_at: new Date().toISOString()        
             })
             .where({id});
