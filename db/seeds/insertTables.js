@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt');
+const password = '123';
+
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
@@ -52,16 +55,16 @@
     {role: 'admin'},
   ]);
   await knex('users').insert([
-    {login: 'Kathleen', password: '123', id_role: 3},
-    {login: 'John', password: '123', id_role: 2},
-    {login: 'Alice', password: '123', id_role: 2},
-    {login: 'Mark', password: '123', id_role: 2},
-    {login: 'Kevin', password: '123', id_role: 1},
-    {login: 'Richard', password: '123', id_role: 1},
-    {login: 'Jane', password: '123', id_role: 1},
-    {login: 'Mary', password: '123', id_role: 1},
-    {login: 'Oswald', password: '123', id_role: 1},
-    {login: 'Pete', password: '123', id_role: 1},
+    {login: 'Kathleen', password: await bcrypt.hash(password, 8), id_role: 3},
+    {login: 'John', password: await bcrypt.hash(password, 8), id_role: 2},
+    {login: 'Alice', password: await bcrypt.hash(password, 8), id_role: 2},
+    {login: 'Mark', password: await bcrypt.hash(password, 8), id_role: 2},
+    {login: 'Kevin', password: await bcrypt.hash(password, 8), id_role: 1},
+    {login: 'Richard', password: await bcrypt.hash(password, 8), id_role: 1},
+    {login: 'Jane', password: await bcrypt.hash(password, 8), id_role: 1},
+    {login: 'Mary', password: await bcrypt.hash(password, 8), id_role: 1},
+    {login: 'Oswald', password: await bcrypt.hash(password, 8), id_role: 1},
+    {login: 'Pete', password: await bcrypt.hash(password, 8), id_role: 1},
   ]);
   await knex('students_education_programs').insert([
     {id_user: '5', id_education_program: '1'},

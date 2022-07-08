@@ -1,45 +1,122 @@
 const knex = require('knex');
 const config = require('../../configs/index');
 const bcrypt = require('bcrypt');
+// const { Forbidden, InappropriateActionError } = require('../errors');
 
 module.exports = {
 
     getStudents: async (req, res) => {
-        const db = knex(config.development.database);
 
-        const students = await db
-        .select({
-            id: 'u.id',
-            login: 'u.login',
-            status: 'u.status_user',
-            role: 'r.role',
-            created: 'u.created_at',
-            updated: 'u.updated_at'
-        })
-        .from({u: 'users'})
-        .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
-        .where({'r.role': 'student'})
-        .orderBy('u.id');
-        res.status(200).json(students);
+        try {            
+            const id = await req.user.id;
+            const role = await req.user.role;
+            const status = await req.query.status;
+            const db = knex(config.development.database);
+    
+            if(status === 'all' && role === 'admin') {            
+                const students = await db
+                .select({
+                    id: 'u.id',
+                    login: 'u.login',
+                    status: 'u.status_user',
+                    role: 'r.role',
+                    created: 'u.created_at',
+                    updated: 'u.updated_at'
+                })
+                .from({u: 'users'})
+                .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
+                .where({'r.role': 'student'})
+                .orderBy('u.id');
+                
+                res.status(200).json(students);
+    
+            } else if (status !== 'all' && role === 'curator'){
+                const st_ed_pr = await db
+                .select({
+                    id: 'st_ed_pr.id',
+                    id_student: 'st_ed_pr.id_user',
+                    login: 'u.login',
+                    education_form: 'ed_form.form_name',
+                    education_area: 'ed_area.area_name',
+                    discipline: 'd.discipline_name',
+                    profile: 'ed_pr.profile_name',
+                    purchase_date: 'st_ed_pr.purchase_date',
+                    status_education: 'st_ed_pr.education_status',
+                    status_program: 'st_ed_pr.program_status', 
+                    modules: 'ed_pr.modules',
+                    test_results: 'st_ed_pr.test_results',
+                    test_finished_at: 'st_ed_pr.test_finished_at'
+                })
+                .from({st_ed_pr: 'students_education_programs'})
+                .innerJoin({u: 'users'}, {'st_ed_pr.id_user': 'u.id'})
+                .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
+                .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
+                .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
+                .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+                .innerJoin({curators: 'curators_of_disciplines'}, {'d.id': 'curators.id_discipline'})
+                .where({"curators.id_user_curator": id})
+                .andWhere({"u.status_user": 'active'})
+                .orderBy('st_ed_pr.id');
+    
+                res.status(200).json(st_ed_pr);
+            } else {
+                res.status(400).json({message: 'wrong adress / role in getStudents'})
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
     },
 
     getCurators: async (req, res) => {
-        const db = knex(config.development.database);
 
-        const curators = await db
-        .select({
-            id: 'u.id',
-            login: 'u.login',
-            status: 'u.status_user',
-            role: 'r.role',
-            created: 'u.created_at',
-            updated: 'u.updated_at'
-        })
-        .from({u: 'users'})
-        .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
-        .where({'r.role': 'curator'})
-        .orderBy('u.id');
-        res.status(200).json(curators);
+        try {            
+            const {id, role} = req.user;
+            const status = req.query.status;
+            const db = await knex(config.development.database);
+    
+            if(status === 'all' && role === 'admin') {            
+                const curators = await db
+                .select({
+                    id: 'u.id',
+                    login: 'u.login',
+                    status: 'u.status_user',
+                    role: 'r.role',
+                    created: 'u.created_at',
+                    updated: 'u.updated_at'
+                })
+                .from({u: 'users'})
+                .innerJoin({r: 'roles'}, {'u.id_role': 'r.id'})
+                .where({'r.role': 'curator'})
+                .orderBy('u.id');
+                const query = await curators;
+                res.status(200).json(query);
+            } else if (status !== 'all' && role === 'student') {
+                const st_ed_pr = await db
+                .select({
+                    id: 'st_ed_pr.id',
+                    id_curator: 'curators.id_user_curator',
+                    login: 'u.login'
+                })
+                .from({st_ed_pr: 'students_education_programs'})
+                .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
+                .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
+                .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
+                .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+                .innerJoin({curators: 'curators_of_disciplines'}, {'d.id': 'curators.id_discipline'})
+                .innerJoin({u: 'users'}, {'curators.id_user_curator': 'u.id'})
+                .andWhere({"u.status_user": 'active'})
+                .andWhere({'st_ed_pr.id_user': id})
+                .andWhere({'curators.status_curator': 'active'})
+                .distinctOn('u.login');
+    
+                const query = await st_ed_pr;
+                res.status(200).json(query);
+            } else {
+                res.status(400).json({message: 'wrong adress / role in getCurators'})
+            }
+        } catch (error) {
+            console.log(error.message);    
+        }
     },
 
     createUser: async (req, res) => {
@@ -70,6 +147,9 @@ module.exports = {
             res.status(200).json({login, password});
       
             return;
+        } else {
+            // throw new InappropriateActionError('bad request');
+            return res.status(400).json({message: 'bad request / error on createUser'});
         }
     },
 
@@ -77,16 +157,20 @@ module.exports = {
         const {id} = req.body;
         const db = knex(config.development.database);
 
-        await db
-        .from('users')
-        .update({
-            status_user: 'deleted',
-            updated_at: new Date().toISOString()         
-        })
-        .where({id});
-        res.status(200);
+        try {            
+            await db
+            .from('users')
+            .update({
+                status_user: 'deleted',
+                updated_at: new Date().toISOString()         
+            })
+            .where({id});
+            res.status(200);
+        } catch (error) {
+            // throw new Forbidden('not enough rights');
+            console.log(error.message);
+        }
 
-        return;
     },
     
     updateUser: async (req, res) => {
@@ -127,7 +211,8 @@ module.exports = {
     
             return;
         } else {
-            throw new Error('invalid parameters passed');
+            // throw new InappropriateActionError('invalid parameters passed');
+            return res.status(400).json({message: 'invalid parameters passed / error on updateUser'});
             
         }
     },

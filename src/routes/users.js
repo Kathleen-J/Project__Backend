@@ -1,12 +1,15 @@
 const {Router} = require('express');
+const { checkAdmin } = require('../middlewares/checkAdmin');
 const { deleteUser, updateUser, getCurators, getStudents, createUser } = require('../controllers/index');
+const {catcher} = require('../utils/catcher');
+const { checkAuth } = require('../middlewares/checkAuth');
 
 const router = Router();
 
-router.get('/students', getStudents);
-router.get('/curators', getCurators);
+router.get('/students', checkAuth, getStudents);
+router.get('/curators', checkAuth, getCurators);
 router.post('/', createUser);
-router.delete('/:id', deleteUser);
-router.put('/:id', updateUser);
+router.put('/:id', checkAuth, updateUser);
+router.delete('/:id', checkAdmin, deleteUser);
 
 module.exports = router;

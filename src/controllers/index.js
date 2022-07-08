@@ -3,5 +3,6 @@ module.exports = {
    ...require('./programs'),
    ...require('./users'),
    ...require('./curatorsDisciplines'),
-   ...require('./studentsPrograms')
+   ...require('./studentsPrograms'),
+   ...require('./auth/getToken')
 };

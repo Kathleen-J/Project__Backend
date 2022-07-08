@@ -168,16 +168,17 @@
         .specificType('progress', 'integer ARRAY')
         .comment('Прогресс обучения');
       table
-        .integer('test_results');
+        .integer('test_results')
+        .comment('Результат теста');
       table
         .timestamp('purchase_date', {useTz: false})
         .notNullable()
         .defaultTo(knex.fn.now())
-        .comment('Дата покупки');
+        .comment('Дата приобретения программы');
       table
         .timestamp('status_updated_at', {useTz: false})
         .nullable()
-        .comment('Дата обновления статуса обучения');
+        .comment('Дата обновления статуса программы');
       table
         .timestamp('test_finished_at', {useTz: false})
         .nullable()
@@ -215,12 +216,12 @@
    * @returns { Promise<void> }
    */
   exports.down = async(knex) => {
-    await knex.schema.dropTable('education_forms');
-    await knex.schema.dropTable('education_areas');
-    await knex.schema.dropTable('disciplines');
-    await knex.schema.dropTable('education_programs');
-    await knex.schema.dropTable('roles');
-    await knex.schema.dropTable('users');
-    await knex.schema.dropTable('students_education_programs');
     await knex.schema.dropTable('curators_of_disciplines');
+    await knex.schema.dropTable('students_education_programs');
+    await knex.schema.dropTable('users');
+    await knex.schema.dropTable('roles');
+    await knex.schema.dropTable('education_programs');
+    await knex.schema.dropTable('disciplines');
+    await knex.schema.dropTable('education_areas');
+    await knex.schema.dropTable('education_forms');
   };

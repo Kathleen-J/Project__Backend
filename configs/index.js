@@ -7,8 +7,8 @@ module.exports = {
       database: {
         client: 'postgresql',
         connection: {
-          database: 'main',
-          user: 'main',
+          database: 'skillfox',
+          user: 'skillfox',
           password: '123',
           host: 'localhost',
           port: '5432'
@@ -30,8 +30,8 @@ module.exports = {
   // staging: {
   //   client: 'postgresql',
   //   connection: {
-  //     database: 'main',
-  //     user:     'main',
+  //     database: 'skillfox',
+  //     user:     'skillfox',
   //     password: '123'
   //   },
   //   pool: {

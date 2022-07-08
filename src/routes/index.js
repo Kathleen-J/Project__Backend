@@ -4,6 +4,7 @@ const programs = require('./programs');
 const users = require('./users');
 const studentsPrograms = require('./studentsPrograms');
 const curatorsDisciplines = require('./curatorsDisciplines');
+const {catcher} = require('../utils/catcher');
 
 const router = Router();
 
