@@ -1,7 +1,7 @@
 const knex = require('knex');
 const config = require('../../configs/index');
 const bcrypt = require('bcrypt');
-// const { Forbidden, InappropriateActionError } = require('../errors');
+const { Forbidden, InappropriateActionError } = require('../errors');
 
 module.exports = {
 
@@ -59,11 +59,16 @@ module.exports = {
                 .orderBy('st_ed_pr.id');
     
                 res.status(200).json(st_ed_pr);
+            } else if (role !== 'admin' || role !== 'curator') {
+                throw new Forbidden('not enough rights');
             } else {
-                res.status(400).json({message: 'wrong adress / role in getStudents'})
+                // res.status(400).json({message: 'wrong adress / role in getStudents'})
+                throw new InappropriateActionError('bad request getStudents');
             }
         } catch (error) {
             console.log(error.message);
+            // throw new InappropriateActionError('error on getStudents');
+            throw new Forbidden('not enough rights');
         }
     },
 
@@ -111,45 +116,56 @@ module.exports = {
     
                 const query = await st_ed_pr;
                 res.status(200).json(query);
+            } else if (role !== 'admin' || role !== 'student') {
+                throw new Forbidden('not enough rights / getCurators');
             } else {
-                res.status(400).json({message: 'wrong adress / role in getCurators'})
+                throw new InappropriateActionError('error in request / getCurators');
+                // res.status(400).json({message: 'wrong adress / role in getCurators'})
             }
         } catch (error) {
             console.log(error.message);    
+            // throw new InappropriateActionError('error in request / getCurators');
+            throw new Forbidden('not enough rights');
         }
     },
 
     createUser: async (req, res) => {
-        const {role, login, password} = req.body;
-        const db = knex(config.development.database);
-
-        if (role === 'curator') {            
-            await db
-            .into('users')
-            .insert([{
-              login,
-              password: await bcrypt.hash(password, 8),
-              created_at: new Date().toISOString(),
-              id_role: 2
-            }]);
-            res.status(200).json({login, password});
-      
-            return;
-        } else if (role === 'student') {
-            await db
-            .into('users')
-            .insert([{
-              login,
-              password: await bcrypt.hash(password, 8),
-              created_at: new Date().toISOString(),
-              id_role: 1
-            }]);
-            res.status(200).json({login, password});
-      
-            return;
-        } else {
-            // throw new InappropriateActionError('bad request');
-            return res.status(400).json({message: 'bad request / error on createUser'});
+        try {
+            const {role, login, password} = req.body;
+            const db = knex(config.development.database);
+    
+            if (role === 'curator') {            
+                await db
+                .into('users')
+                .insert([{
+                  login,
+                  password: await bcrypt.hash(password, 8),
+                  created_at: new Date().toISOString(),
+                  id_role: 2
+                }]);
+                res.status(200).json({login, password});
+          
+                return;
+            } else if (role === 'student') {
+                await db
+                .into('users')
+                .insert([{
+                  login,
+                  password: await bcrypt.hash(password, 8),
+                  created_at: new Date().toISOString(),
+                  id_role: 1
+                }]);
+                res.status(200).json({login, password});
+          
+                return;
+            } else {
+                console.log('bad request on createUser');
+                throw new InappropriateActionError('bad request on createUser');
+                // return res.status(400).json({message: 'bad request / error on createUser'});
+            }            
+        } catch (error) {
+            console.log(error.message);
+            throw new InappropriateActionError('bad request on createUser');
         }
     },
 
@@ -167,53 +183,58 @@ module.exports = {
             .where({id});
             res.status(200);
         } catch (error) {
-            // throw new Forbidden('not enough rights');
             console.log(error.message);
+            throw new InappropriateActionError('bad request on deleteUser');
         }
 
     },
     
     updateUser: async (req, res) => {
-        const {id, login, password} = req.body;
-        const db = knex(config.development.database);
-        
-        if(req.body.id && (Object.keys(req.body).length < 2)) {
-            await db
-            .from('users')
-            .update({
-                status_user: 'active',
-                updated_at: new Date().toISOString()         
-            })
-            .where({id});
-            res.status(200);
-    
-            return;
-        } else  if (req.body.id && req.body.login && (Object.keys(req.body).length < 3)) {
-            await db
-            .from('users')
-            .update({
-                login,
-                updated_at: new Date().toISOString()        
-            })
-            .where({id});
-            res.status(200);
-    
-            return;
-        } else  if (req.body.id && req.body.password && (Object.keys(req.body).length < 3)) {
-            await db
-            .from('users')
-            .update({
-                password: await bcrypt.hash(password, 8),
-                updated_at: new Date().toISOString()        
-            })
-            .where({id});
-            res.status(200);
-    
-            return;
-        } else {
-            // throw new InappropriateActionError('invalid parameters passed');
-            return res.status(400).json({message: 'invalid parameters passed / error on updateUser'});
+        try {
+            const {id, login, password} = req.body;
+            const db = knex(config.development.database);
             
+            if(req.body.id && (Object.keys(req.body).length < 2)) {
+                await db
+                .from('users')
+                .update({
+                    status_user: 'active',
+                    updated_at: new Date().toISOString()         
+                })
+                .where({id});
+                res.status(200);
+        
+                return;
+            } else  if (req.body.id && req.body.login && (Object.keys(req.body).length < 3)) {
+                await db
+                .from('users')
+                .update({
+                    login,
+                    updated_at: new Date().toISOString()        
+                })
+                .where({id});
+                res.status(200);
+        
+                return;
+            } else  if (req.body.id && req.body.password && (Object.keys(req.body).length < 3)) {
+                await db
+                .from('users')
+                .update({
+                    password: await bcrypt.hash(password, 8),
+                    updated_at: new Date().toISOString()        
+                })
+                .where({id});
+                res.status(200);
+        
+                return;
+            } else {
+                throw new InappropriateActionError('invalid parameters passed / updateUser');
+                // return res.status(400).json({message: 'invalid parameters passed / error on updateUser'});
+                
+            }            
+        } catch (error) {
+            console.log(error.message);
+            throw new InappropriateActionError('bad request / updateUser');
         }
     },
 }

@@ -20,9 +20,9 @@ module.exports = {
             res.status(200).json(ed_ar);
             
         } catch (error) {
-            // throw new InappropriateActionError('bad request');
-            return res.status(400).json({message: 'bad request'});
             console.log(error.message);
+            throw new InappropriateActionError('bad request / getActiveEducationAreas');
+            // return res.status(400).json({message: 'bad request'});
         }
         },
 }

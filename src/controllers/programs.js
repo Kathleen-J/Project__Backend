@@ -1,6 +1,6 @@
 const knex = require('knex');
 const config = require('../../configs/index');
-// const { InappropriateActionError, Forbidden } = require('../errors');
+const { InappropriateActionError, Forbidden } = require('../errors');
 
 module.exports = {
 
@@ -26,10 +26,12 @@ module.exports = {
             .where({'ed_area.status_area': 'active'})
             .andWhere({'d.status_discipline': 'active'})
             .andWhere({'ed_pr.status_program': 'active'})
-            .orderBy('ed_pr.price', 'desc');
+            .orderBy('ed_pr.price', 'desc')
+            .orderBy('ed_pr.id');
             res.status(200).json(education_programs);
         } catch (error) {
-            res.status(400).json({message: 'bad request'});
+            // res.status(400).json({message: 'bad request'});
+            throw new InappropriateActionError('bad request / error on getEducationPrograms')
         }
     },
 
@@ -61,8 +63,8 @@ module.exports = {
             res.status(200).json(education_programs);
 
         } catch (error) {
-            // throw new InappropriateActionError('bad request')
-            return res.status(400).json({message: 'bad request'})
+            throw new InappropriateActionError('bad request on getActiveEducationProgram')
+            // return res.status(400).json({message: 'bad request'})
         }
     },
 
@@ -84,10 +86,12 @@ module.exports = {
             .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
             .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
             .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
-            .orderBy('ed_pr.price', 'desc');
+            .orderBy('ed_pr.price', 'desc')
+            .orderBy('ed_pr.id');
             res.status(200).json(education_programs);
         } catch (er) {
             console.log(err.message, 'on getAllEducationPrograms');
+            throw new InappropriateActionError('bad request on getActiveEducationProgram')
         }
     },
 
@@ -104,9 +108,9 @@ module.exports = {
             .where({id});
             res.status(200);
         } catch (error) {
-            // throw new Forbidden('not enough rights');
-            // return res.status(403).json({message: 'forbidden'})
-            console.log(error.message, 'on deleteProgram');
+            console.log(error.message, 'error on deleteProgram');
+            throw new InappropriateActionError('bad request on deleteProgram');
+            // return res.status(403).json({message: 'bad request'})
         }
 
     },
@@ -124,9 +128,9 @@ module.exports = {
             .where({id});
             res.status(200);
         } catch (error) {
-            // throw new Forbidden('not enough rights');
-            // return res.status(403).json({message: 'forbidden'});
-            console.log(error.message, 'on updateProgram');
+            console.log(error.message, 'error on updateProgram');
+            throw new InappropriateActionError('bad request on updateProgram');
+            // return res.status(403).json({message: 'bad request on updateProgram'});
         }
 
     },

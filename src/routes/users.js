@@ -6,10 +6,10 @@ const { checkAuth } = require('../middlewares/checkAuth');
 
 const router = Router();
 
-router.get('/students', checkAuth, getStudents);
-router.get('/curators', checkAuth, getCurators);
-router.post('/', createUser);
-router.put('/:id', checkAuth, updateUser);
-router.delete('/:id', checkAdmin, deleteUser);
+router.get('/students', checkAuth, catcher(getStudents));
+router.get('/curators', checkAuth, catcher(getCurators));
+router.post('/', catcher(createUser));
+router.put('/:id', checkAuth, catcher(updateUser));
+router.delete('/:id', checkAdmin, catcher(deleteUser));
 
 module.exports = router;
