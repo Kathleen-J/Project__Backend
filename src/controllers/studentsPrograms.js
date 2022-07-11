@@ -70,6 +70,7 @@ module.exports = {
                     .innerJoin({u_с: 'users'}, {'curators.id_user_curator': 'u_с.id'})
                     .where({'st_ed_pr.id_user': id})
                     .andWhere({'st_ed_pr.program_status': 'active'})
+                    .andWhere({'u.status_user': 'active'})
                     .distinctOn('st_ed_pr.id');
                 res.status(200).json(st_ed_pr);
 

@@ -56,6 +56,8 @@ module.exports = {
                 .innerJoin({curators: 'curators_of_disciplines'}, {'d.id': 'curators.id_discipline'})
                 .where({"curators.id_user_curator": id})
                 .andWhere({"u.status_user": 'active'})
+                .andWhere({'st_ed_pr.education_status': 'unfinished'})
+                .andWhere({'st_ed_pr.program_status': 'active'})
                 .orderBy('st_ed_pr.id');
     
                 res.status(200).json(st_ed_pr);
