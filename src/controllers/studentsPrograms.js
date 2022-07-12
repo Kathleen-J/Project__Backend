@@ -4,6 +4,28 @@ const { Forbidden, Unauthorized, InappropriateActionError } = require('../errors
 
 module.exports = {
 
+    //:id
+    getStudentsEducationProgram: async (req, res) => {
+        const {id} = req.params;
+        const idUser = req.user.id;
+        const db = knex(config.development.database);
+
+        try {
+            const program = await db
+            .first({
+                id: 'ed_pr.id'
+            })
+            .from({st_ed_pr: 'students_education_programs'})
+            .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
+            .where({'ed_pr.id': id})
+            .andWhere({'st_ed_pr.id_user': idUser})
+            res.status(200).json(program);
+        } catch (error) {
+            console.log(error.message);            
+            throw new InappropriateActionError('bad request / getStudentsEducationPrograms');
+        }
+    },
+
     getStudentsEducationPrograms: async (req, res) => {
         const {id, role} = req.user;
         const status = req.query.status;
@@ -37,7 +59,7 @@ module.exports = {
                 .orderBy('st_ed_pr.id');
                 res.status(200).json(st_ed_pr);
 
-            } else if (role === 'student' && status !== 'all') {
+            } else if (status !== 'all') {
 
                 const st_ed_pr = await db
                     .select({
@@ -48,6 +70,7 @@ module.exports = {
                         education_area: 'ed_area.area_name',
                         id_discipline: 'd.id',
                         discipline: 'd.discipline_name',
+                        id_program: 'st_ed_pr.id_education_program',
                         profile: 'ed_pr.profile_name',
                         purchase_date: 'st_ed_pr.purchase_date',
                         status_education: 'st_ed_pr.education_status',
@@ -81,6 +104,26 @@ module.exports = {
                 // res.status(400).json({message: 'wrong adress / params / error on getStudentsEducationPrograms'})
                 throw new InappropriateActionError('wrong adress / params / getStudentsEducationPrograms')
             }
+        } catch (error) {
+            console.log(error.message);
+            throw new InappropriateActionError('bad request / getStudentsEducationPrograms')
+        }
+    },
+
+    buyStudentsEducationProgram: async (req, res) => {
+        
+        try {
+            const {id} = req.body;
+            const idUser = req.user.id;
+            const db = knex(config.development.database);
+
+            await db
+            .into('students_education_programs')
+            .insert([{
+                id_user: idUser,
+                id_education_program: id
+            }]);
+            res.status(200).json({idUser});
         } catch (error) {
             console.log(error.message);
             throw new InappropriateActionError('bad request / getStudentsEducationPrograms')

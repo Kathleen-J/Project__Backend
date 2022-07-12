@@ -5,6 +5,24 @@ const { Forbidden, InappropriateActionError } = require('../errors');
 
 module.exports = {
 
+    getStatusUser: async (req, res) => {
+        const {id} = req.params;
+        const db = knex(config.development.database);
+
+        try {
+            const statusUser = await db
+            .first({
+                status_user: 'u.status_user'
+            })
+            .from({u: 'users'})
+            .where({'u.id': id});
+            res.status(200).json(statusUser);
+
+        } catch (error) {
+            throw new InappropriateActionError('bad request on getStatusUser')
+        }
+    },
+
     getStudents: async (req, res) => {
 
         try {            
@@ -145,7 +163,7 @@ module.exports = {
                   created_at: new Date().toISOString(),
                   id_role: 2
                 }]);
-                res.status(200).json({login, password});
+                res.status(200).json({login});
           
                 return;
             } else if (role === 'student') {
@@ -157,7 +175,7 @@ module.exports = {
                   created_at: new Date().toISOString(),
                   id_role: 1
                 }]);
-                res.status(200).json({login, password});
+                res.status(200).json({login});
           
                 return;
             } else {
