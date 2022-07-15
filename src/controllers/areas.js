@@ -1,11 +1,12 @@
-const knex = require('knex');
-const config = require('../../configs/index');
+// const knex = require('knex');
+// const config = require('../../configs/index');
+import db from './db';
 const { InappropriateActionError } = require('../errors');
 
 module.exports = {
 
     getActiveEducationAreas: async (req, res)   => {
-        const db = knex(config[process.env.NODE_ENV || 'development'].database);
+        // const db = knex(config[process.env.NODE_ENV || 'development'].database);
         
         try {
             const ed_ar = await db

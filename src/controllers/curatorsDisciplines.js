@@ -1,5 +1,6 @@
-const knex = require('knex');
-const config = require('../../configs/index');
+// const knex = require('knex');
+// const config = require('../../configs/index');
+import db from './db';
 const { Forbidden } = require('../errors');
 
 module.exports = {
@@ -7,7 +8,7 @@ module.exports = {
     getCuratorsOfDisciplines: async (req, res) => {
         
         try {
-            const db = knex(config[process.env.NODE_ENV || 'development'].database);
+            // const db = knex(config[process.env.NODE_ENV || 'development'].database);
             const curators_dis = await db
                 .select({
                     id: 'curators_dis.id',
@@ -33,7 +34,7 @@ module.exports = {
 
     deleteCuratorsDiscipline: async (req, res) => {
         const {id} = req.body;
-        const db = knex(config[process.env.NODE_ENV || 'development'].database);
+        // const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {            
             await db
@@ -53,7 +54,7 @@ module.exports = {
 
     updateCuratorsDiscipline: async (req, res) => {
         const {id} = req.body;
-        const db = knex(config[process.env.NODE_ENV || 'development'].database);
+        // const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {            
             await db
