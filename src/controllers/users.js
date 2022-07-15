@@ -76,6 +76,7 @@ module.exports = {
                 .andWhere({"u.status_user": 'active'})
                 .andWhere({'st_ed_pr.education_status': 'unfinished'})
                 .andWhere({'st_ed_pr.program_status': 'active'})
+                .andWhere({'curators.status_curator': 'active'})
                 .orderBy('st_ed_pr.id');
     
                 res.status(200).json(st_ed_pr);

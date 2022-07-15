@@ -62,39 +62,42 @@ module.exports = {
             } else if (status !== 'all') {
 
                 const st_ed_pr = await db
-                    .select({
-                        id: 'st_ed_pr.id',
-                        id_student: 'st_ed_pr.id_user',
-                        login: 'u.login',
-                        education_form: 'ed_form.form_name',
-                        education_area: 'ed_area.area_name',
-                        id_discipline: 'd.id',
-                        discipline: 'd.discipline_name',
-                        id_program: 'st_ed_pr.id_education_program',
-                        profile: 'ed_pr.profile_name',
-                        purchase_date: 'st_ed_pr.purchase_date',
-                        status_education: 'st_ed_pr.education_status',
-                        status_program: 'st_ed_pr.program_status', 
-                        modules: 'ed_pr.modules',
-                        test_results: 'st_ed_pr.test_results',
-                        test_finished_at: 'st_ed_pr.test_finished_at',
-                        status_updated_at: 'st_ed_pr.status_updated_at',
-                        curator: 'u_с.login',
-                        status_curator: 'curators.status_curator',
-                        status_curator_user: 'u_с.status_user'
-                    })
-                    .from({st_ed_pr: 'students_education_programs'})
-                    .innerJoin({u: 'users'}, {'st_ed_pr.id_user': 'u.id'})
-                    .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
-                    .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
-                    .innerJoin({curators: 'curators_of_disciplines'}, {'d.id': 'curators.id_discipline'})
-                    .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
-                    .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
-                    .innerJoin({u_с: 'users'}, {'curators.id_user_curator': 'u_с.id'})
-                    .where({'st_ed_pr.id_user': id})
-                    .andWhere({'st_ed_pr.program_status': 'active'})
-                    .andWhere({'u.status_user': 'active'})
-                    .distinctOn('st_ed_pr.id');
+                    .select('*')
+                    .from({st_ed_pr: db
+                        .select({
+                            id: 'st_ed_pr.id',
+                            id_student: 'st_ed_pr.id_user',
+                            login: 'u.login',
+                            education_form: 'ed_form.form_name',
+                            education_area: 'ed_area.area_name',
+                            id_discipline: 'd.id',
+                            discipline: 'd.discipline_name',
+                            id_program: 'st_ed_pr.id_education_program',
+                            profile: 'ed_pr.profile_name',
+                            purchase_date: 'st_ed_pr.purchase_date',
+                            status_education: 'st_ed_pr.education_status',
+                            status_program: 'st_ed_pr.program_status', 
+                            modules: 'ed_pr.modules',
+                            test_results: 'st_ed_pr.test_results',
+                            test_finished_at: 'st_ed_pr.test_finished_at',
+                            status_updated_at: 'st_ed_pr.status_updated_at',
+                            curator: 'u_с.login',
+                            status_curator: 'curators.status_curator',
+                            status_curator_user: 'u_с.status_user'
+                        })
+                        .from({st_ed_pr: 'students_education_programs'})
+                        .innerJoin({u: 'users'}, {'st_ed_pr.id_user': 'u.id'})
+                        .innerJoin({ed_pr: 'education_programs'}, {'st_ed_pr.id_education_program': 'ed_pr.id'})
+                        .innerJoin({d: 'disciplines'}, {'ed_pr.id_discipline': 'd.id'})
+                        .innerJoin({curators: 'curators_of_disciplines'}, {'d.id': 'curators.id_discipline'})
+                        .innerJoin({ed_form: 'education_forms'}, {'ed_pr.id_education_form': 'ed_form.id'})
+                        .innerJoin({ed_area: 'education_areas'}, {'d.id_education_area': 'ed_area.id'})
+                        .innerJoin({u_с: 'users'}, {'curators.id_user_curator': 'u_с.id'})
+                        .where({'st_ed_pr.id_user': id})
+                        .andWhere({'st_ed_pr.program_status': 'active'})
+                        .andWhere({'u.status_user': 'active'})
+                        .orderBy(['curators.status_curator', 'u_с.status_user'])
+                    }).distinctOn('st_ed_pr.id')
                 res.status(200).json(st_ed_pr);
 
             } else if (role !== 'student' || role !== 'admin') {
@@ -127,6 +130,26 @@ module.exports = {
         } catch (error) {
             console.log(error.message);
             throw new InappropriateActionError('bad request / getStudentsEducationPrograms')
+        }
+    },
+
+    updateTestResult: async (req, res) => {
+        try {
+            const {id, value} = req.body;
+            const db = knex(config.development.database);
+
+            await db
+            .from('students_education_programs')
+            .update({
+                education_status: 'finished',
+                test_results: value,
+                test_finished_at: new Date().toISOString()         
+            })
+            .where({id});
+            res.status(200).json({message: 'status 200 OK'});
+        } catch (error) {
+            console.log(error.message);
+            throw new InappropriateActionError('bad request / updateStudentsEducationPrograms')
         }
     },
 
@@ -187,8 +210,17 @@ module.exports = {
                 .where({id});
                 res.status(200).json({message: 'status 200 OK'});
                 
-            } else if (value === 'unfinished' && (role === 'admin' || role === 'student')) {
+            } else if (value === 'unfinished' && role === 'admin') {
                 
+                await db
+                .from('students_education_programs')
+                .update({
+                    education_status: 'finished',
+                    status_updated_at: new Date().toISOString()    
+                })
+                .where({id});
+                res.status(200).json({message: 'status 200 OK'});
+            } else if (role === 'student') {
                 await db
                 .from('students_education_programs')
                 .update({
