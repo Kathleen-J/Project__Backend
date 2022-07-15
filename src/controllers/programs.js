@@ -5,7 +5,7 @@ const { InappropriateActionError, Forbidden } = require('../errors');
 module.exports = {
 
     getEducationPrograms: async (req, res) => {
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {
             const education_programs = await db
@@ -38,7 +38,7 @@ module.exports = {
     //education_program :id (программа обучения)
     getActiveEducationProgram: async (req, res) => {
         const {id} = req.params;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
     
         try {
             const education_programs = await db
@@ -70,7 +70,7 @@ module.exports = {
 
     getAllEducationPrograms: async (req, res) => {
         try {            
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
             const education_programs = await db
             .select({
                 id: 'ed_pr.id',
@@ -97,7 +97,7 @@ module.exports = {
 
     deleteProgram: async (req, res) => {
         const {id} = req.body;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {            
             await db
@@ -117,7 +117,7 @@ module.exports = {
 
     updateProgram: async (req, res) => {
         const {id} = req.body;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {            
             await db

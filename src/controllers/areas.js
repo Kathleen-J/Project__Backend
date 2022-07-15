@@ -5,7 +5,7 @@ const { InappropriateActionError } = require('../errors');
 module.exports = {
 
     getActiveEducationAreas: async (req, res)   => {
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
         
         try {
             const ed_ar = await db

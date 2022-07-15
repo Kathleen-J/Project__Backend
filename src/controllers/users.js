@@ -7,7 +7,7 @@ module.exports = {
 
     getStatusUser: async (req, res) => {
         const {id} = req.params;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);        
 
         try {
             const statusUser = await db
@@ -29,7 +29,7 @@ module.exports = {
             const id = await req.user.id;
             const role = await req.user.role;
             const status = await req.query.status;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
     
             if(status === 'all' && role === 'admin') {            
                 const students = await db
@@ -153,7 +153,7 @@ module.exports = {
     createUser: async (req, res) => {
         try {
             const {role, login, password} = req.body;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
     
             if (role === 'curator') {            
                 await db
@@ -192,7 +192,7 @@ module.exports = {
 
     deleteUser: async (req, res) => {
         const {id} = req.body;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {            
             await db
@@ -213,7 +213,7 @@ module.exports = {
     updateUser: async (req, res) => {
         try {
             const {id, login, password} = req.body;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
             
             if(req.body.id && (Object.keys(req.body).length < 2)) {
                 await db

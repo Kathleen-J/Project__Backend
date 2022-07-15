@@ -4,7 +4,7 @@ const config = require('../../../configs/index');
 module.exports = {
 
     async getUserByLogin(login) {
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
         
         const user = await db
             .first({

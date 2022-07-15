@@ -8,7 +8,7 @@ module.exports = {
     getStudentsEducationProgram: async (req, res) => {
         const {id} = req.params;
         const idUser = req.user.id;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
         try {
             const program = await db
@@ -29,7 +29,7 @@ module.exports = {
     getStudentsEducationPrograms: async (req, res) => {
         const {id, role} = req.user;
         const status = req.query.status;
-        const db = knex(config.development.database);
+        const db = knex(config[process.env.NODE_ENV || 'development'].database);
     
         try {                 
             if (role === 'admin' && status === 'all') {
@@ -118,7 +118,7 @@ module.exports = {
         try {
             const {id} = req.body;
             const idUser = req.user.id;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
             await db
             .into('students_education_programs')
@@ -136,7 +136,7 @@ module.exports = {
     updateTestResult: async (req, res) => {
         try {
             const {id, value} = req.body;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
 
             await db
             .from('students_education_programs')
@@ -157,7 +157,7 @@ module.exports = {
     updateStudentsEducationPrograms: async (req, res) => {
         try {            
             const {id, value} = req.body;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
             
             if(value === 'deleted') {
                 
@@ -197,7 +197,7 @@ module.exports = {
         try {            
             const {id, value} = req.body;
             const role = req.user.role;
-            const db = knex(config.development.database);
+            const db = knex(config[process.env.NODE_ENV || 'development'].database);
             
             if(value === 'active' && role === 'admin') {
                 
