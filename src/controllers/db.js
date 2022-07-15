@@ -1,4 +1,4 @@
 const knex = require('knex');
-const config = require('../../../configs/index');
+const config = require('../../configs');
 
-export const db = knex(config[process.env.NODE_ENV || 'development'].database);
+module.exports = knex(config[process.env.NODE_ENV || 'development'].database);

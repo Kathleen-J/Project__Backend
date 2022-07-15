@@ -1,6 +1,6 @@
 // const knex = require('knex');
 // const config = require('../../../configs/index');
-import db from '../db';
+const db = require('../db');
 
 module.exports = {
 

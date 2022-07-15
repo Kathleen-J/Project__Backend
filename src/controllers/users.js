@@ -1,6 +1,6 @@
 // const knex = require('knex');
 // const config = require('../../configs/index');
-import db from './db';
+const db = require('../db');
 const bcrypt = require('bcrypt');
 const { Forbidden, InappropriateActionError } = require('../errors');
 
@@ -99,7 +99,7 @@ module.exports = {
         try {            
             const {id, role} = req.user;
             const status = req.query.status;
-            const db = await knex(config.development.database);
+            // const db = await knex(config.development.database);
     
             if(status === 'all' && role === 'admin') {            
                 const curators = await db
